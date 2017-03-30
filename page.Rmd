@@ -1,0 +1,224 @@
+---
+title: "Отчет по курсу математического моделирования на основе языка R"
+author: "Ахтырская Елизавета, студентка 121 гурппы ПАЭ"
+date: "30.03.2017"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Ниже предсталены задачи по курсу "математическое моделирование" и их решения.
+
+## Задача №1
+### Вычислить среднее для каждой колонки таблицы iris, за исключением колонки “Species” и соберите результат в список (list).
+
+```
+iris
+iris[1,3]
+head(iris)
+tail(iris)
+list <- iris
+list[1,1:4]
+list <- iris("a" = mean(iris$Petal.Width), "b" = mean(iris$Sepal.Width), "c" = mean(iris$Petal.Length), "d"=mean(iris$Sepal.Length))
+typeof(list)
+list 
+```
+
+
+## Задача №2 
+### Вычислить среднее для каждой строки, исключив перед этим колонку “Species” и сохраните результат в векторе.
+
+```
+ir=iris[c(1:4)] 
+x=vector()
+for(i in 1:length(iris$Sepal.Length))
+        {  x[i] <- mean(t(ir[i,])) }
+x
+
+```
+## Задача №3 
+### Создайте случайные 1000 нуклеотидов, сохранив их в вектор DNA, посчитайте количество нуклеотидов A и T, их долю от общей длинны ДНК и запишите результат в вектор.
+ 
+ 
+```
+DNA <- c("A", "T", "C", "G" ) 
+DNA = DNA[runif(1000, 1, 5)]
+DNA_1 = summary(factor(DNA))
+
+dna_at=DNA_1[-c(2,3)]
+ratio=dna_at/length(DNA)
+ratio
+```
+
+## Задача №4
+### Создайте векто в котором записан произвольный набор латинских букв длинной не менее 10000 символов и посчитайте количество гласных.
+
+```
+#создаем массив случайных букв
+let = letters[runif(10000, 1, 26)] 
+let
+let=factor(letters[runif(10000, 1, 26)])
+#выделяем гласные
+let1=summary(let)[c("a", "e","i","o","u","y")] #сколько их всего
+let1
+n_gl=sum(let1)
+n_gl
+```
+
+## Задание №5
+### Отсортируйте все виды в таблице iris по средней длинне лепестков.
+
+```
+iris
+x <- factor(iris[order(iris$Petal.Length),]$Species)
+x
+```
+## Задание №6 
+###Напишите функцию для рассчета медианы вектора.
+
+```
+iris
+str(iris)
+median <- function(x) {
+  z=sort(x)
+  if((length(z)%%2)!=0){
+    result = z[(length(x)/2)+1]
+  }
+  else
+    result = (z[length(x)/2]+z[length(x)/2+1])/2
+  return(result)
+}
+median(iris$Sepal.Length)
+```
+
+
+
+## Задание №7 
+### Постройте график зависимости длины чашелистиков от длинны лепестков для каждого вида из таблицы iris
+```
+iris
+library(ggplot2) 
+
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) + geom_jitter(alpha = 0.6) + facet_grid(. ~ Species)
+```
+
+
+## Задание №8
+### По данным таблицы "diamonds почитайте среднюю стоимость цены карата для бриллиантов дороже 1000$ для каждой категории яркости 
+```
+ggplot(diamonds)
+diamonds
+levels(factor(diamonds$clarity))
+x=levels(factor(diamonds$clarity))
+y=vector()
+for (i in 1:length(x)) {
+  y[i]=mean(diamonds$price[(diamonds$price>1000) & diamonds$clarity==x[i]])
+}
+y
+```
+
+
+#Регрессионный и корелляционный анализы
+## Задача №1
+### Написать собственную функцию, которая бы для двух векторов одинакового объема считала бы коэффициент корелляции Спирмена.
+
+```
+iris
+spirman <- function(x, y) {
+  if(length(x)==length(y) && is.vector(x)==TRUE && is.vector(y)==TRUE){
+    p=1
+    n=length(x)
+    rx=rank(x)
+    ry=rank(y)
+    for(i in 1:n)
+    {
+      p = p - ((( rx[i] - ry[i] )^2)*6)/(n*(n^2-1))
+    }
+  }
+  else{
+    if(is.vector(x)==TRUE && is.vector(y)==TRUE)
+      print("Ошибка. Вектора должны быть одинаковой длины")
+    else
+      print("Ошибка.Входные данные должны быть векторами")
+    p=-1
+  }
+  return(p)
+}
+spirman(iris$Sepal.Length,iris$Petal.Length)
+```
+
+
+##Задача №2 
+###Используя данные, постройте оптимальную линейную модель множественной регрессии.
+
+```
+tbl<- read.csv("https://www.dropbox.com/s/erhs9hoj4vhrz0b/eddypro.csv?dl=1", header = FALSE, sep = ",", skip = 1, na =c("","NA","-9999","-9999.0"), comment=c("["))
+
+tbl
+#узнаем структуру файла
+str(tbl)
+head(tbl)
+tail(tbl)
+install.packages("tidyverse")
+library("tidyverse")
+install.packages("nycflights13")
+library("nycflights13")
+install.packages("tidyr")
+library("tidyr")
+install.packages("stringr")
+library("stringr")
+install.packages("dplyr")
+library("dplyr")
+install.packages("tibble")
+library("tibble")
+install.packages("reader")
+library("reader")
+
+tbl = tbl[-2,]
+tbl
+glimpse(tbl)
+tbl = select(tbl, -(roll))
+tbl = tbl %>% mutate_if(is.character, factor)
+#names(tbl) =  str_replace_all(names(tbl), "[!]","_emph_")
+names(tbl) = names(tbl) %>% 
+  str_replace_all("[!]","_emph_") %>% 
+  str_replace_all("[?]","_quest_") %>% 
+  str_replace_all("[*]","_star_") %>% 
+  str_replace_all("[+]","_plus_") %>%
+  str_replace_all("[@]","_at_") %>%
+  str_replace_all("[-]","_minus_") %>%
+  str_replace_all("[$]","_dollar_") %>%
+  str_replace_all("[#]","_hash_") %>%
+  str_replace_all("[/]","_div_") %>%
+  str_replace_all("[%]","_perc_") %>%
+  str_replace_all("[&]","_amp_") %>%
+  str_replace_all("[\\^]","_power_") %>%
+  str_replace_all("[()]","_") 
+glimpse(tbl)
+sapply(tbl,is.numeric)
+tbl_numeric = tbl[,sapply(tbl,is.numeric)]
+tbl_non_numeric = tbl[,!sapply(tbl,is.numeric) ]
+tbl_numeric <- drop_na(tbl_numeric)
+names(tbl_numeric)
+
+cor_td = cor(drop_na(tbl_numeric)) %>% as.data.frame %>% select(co2_flux)
+vars = row.names(cor_td)[cor_td$co2_flux^2 > .1] %>% na.exclude
+formula = as.formula(paste("co2_flux~", paste(vars,collapse = "+"), sep=""))
+formula1 = as.formula(paste("co2_flux", paste(vars,collapse = "+"), sep=""))
+teaching_tbl = sample_n(tbl, floor(length(tbl$date)*.7))
+testing_tbl = sample_n(tbl, floor(length(tbl$date)*.3))
+tbl_numeric = filter(tbl_numeric, DOY > 151)
+tbl_numeric = filter(tbl_numeric, DOY < 243)
+mod = lm(co2_flux ~ (Tau+rand_err_Tau+H+rand_err_H+LE+qc_LE+rand_err_LE+co2_flux+h2o_flux+qc_h2o_flux+rand_err_h2o_flux+H_strg+co2_molar_density+h2o_time_lag+sonic_temperature+air_temperature+air_density+air_molar_volume+es+RH+VPD+max_speed+u_star_+TKE+T_star_+un_Tau+un_H+un_LE+un_co2_flux+un_h2o_flux+u_var+v_var+w_var+h2o_var+w_div_ts_cov+w_div_co2_cov+w_div_h2o_cov+flowrate)^2, data = tbl_numeric)
+summary(mod)
+resid(mod)
+coef(mod)
+names(tbl_numeric)
+qplot(co2_flux, DOY, data = tbl_numeric, alpha = I(1/10)) + theme_bw() + geom_line(aes(y = predict(mod)))
+qplot(co2_flux, predict(mod), data = tbl_numeric, geom = "line")
+qplot(flowrate, co2_flux, data = tbl_numeric, alpha = I(1/10)) + theme_bw() + geom_line(aes(y = predict(mod)))
+
+anova(mod)
+```
